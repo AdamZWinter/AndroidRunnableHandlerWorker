@@ -9,12 +9,15 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+import android.app.Notification;
+import androidx.core.app.NotificationCompat;
 
 public class TimerWorker extends Worker {
 
     public final static String KEY_MILLISECONDS_REMAINING = "com.zybooks.timer.MILLIS_LEFT";
     private final static String CHANNEL_ID_TIMER = "channel_timer";
     private final NotificationManager mNotificationManager;
+    private final static int NOTIFICATION_ID = 0;
 
     public TimerWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
@@ -78,6 +81,17 @@ public class TimerWorker extends Worker {
     }
 
     private void createTimerNotification(String text) {
-        // TODO: Create a notification
+
+        // Create notification with various properties
+        Notification notification = new NotificationCompat.Builder(
+                getApplicationContext(), CHANNEL_ID_TIMER)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle(getApplicationContext().getString(R.string.app_name))
+                .setContentText(text)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build();
+
+        // Post notification
+        mNotificationManager.notify(NOTIFICATION_ID, notification);
     }
 }
