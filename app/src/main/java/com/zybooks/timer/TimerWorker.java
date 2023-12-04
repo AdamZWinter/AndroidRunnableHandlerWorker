@@ -5,13 +5,20 @@ import androidx.annotation.NonNull;
 import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+import static android.content.Context.NOTIFICATION_SERVICE;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
 
 public class TimerWorker extends Worker {
 
     public final static String KEY_MILLISECONDS_REMAINING = "com.zybooks.timer.MILLIS_LEFT";
+    private final static String CHANNEL_ID_TIMER = "channel_timer";
+    private final NotificationManager mNotificationManager;
 
     public TimerWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
+        mNotificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
     }
 
     @NonNull
@@ -58,7 +65,16 @@ public class TimerWorker extends Worker {
     }
 
     private void createTimerNotificationChannel() {
-        // TODO: Create a notification channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getApplicationContext().getString(R.string.channel_name);
+            String description = getApplicationContext().getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID_TIMER, name, importance);
+            channel.setDescription(description);
+
+            // Register channel with system
+            mNotificationManager.createNotificationChannel(channel);
+        }
     }
 
     private void createTimerNotification(String text) {
